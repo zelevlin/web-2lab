@@ -58,6 +58,12 @@ form button[type="submit"] {
   background: transparent;
   cursor: pointer;
 }
+input,
+button,
+select,
+textarea {
+  font-size: 16px;
+}
 
 /* ================================
    СПИСОК ЗАДАЧ
