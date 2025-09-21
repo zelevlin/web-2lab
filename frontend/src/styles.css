@@ -20,20 +20,45 @@
 
 * { box-sizing: border-box; }
 
-html, body { height: 100%; }
+/* =================================
+   ГЛОБАЛЬНАЯ ВЫСОТА/СКРОЛЛ
+   (страница не скроллится, скролл только у списка)
+================================= */
+html {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
 
 body {
+  position: fixed;     /* фиксируем страницу в пределах экрана */
+  inset: 0;
   margin: 0;
-  min-height: 100vh;
-  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  overflow: hidden;          /* запрет скролла страницы */
+  overscroll-behavior: none; /* без резиновой «протяжки» */
+  touch-action: none;        /* жесты на body отключаем */
+}
+
+@supports (height: 100dvh) {
+  body { height: 100dvh; }
+}
+
+/* когда идёт DnD — запрет выделения текста и подсветки тапа */
+.no-select, .no-select * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =================================
-   КОНТЕЙНЕРЫ
+   КАРКАС
 ================================= */
 header, footer {
   flex: 0 0 auto;
@@ -53,7 +78,8 @@ main {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  min-height: 0; /* важно: разрешаем детям сжиматься */
+  min-height: 0;      /* разрешаем детям сжиматься */
+  overflow: hidden;   /* скролл только у .list-wrap */
 }
 
 /* Прокручиваемая оболочка для списка */
@@ -61,11 +87,17 @@ main {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  padding-right: 4px; /* под скроллбар */
+  padding-right: 4px;                 /* под скроллбар */
+  -webkit-overflow-scrolling: touch;  /* плавнее на iOS */
+  overscroll-behavior: contain;       /* не тянуть всю страницу */
+  touch-action: pan-y;                /* на мобилках — вертикальный скролл только тут */
 }
 
+/* во время перетаскивания карточки — блокируем нативный скролл списка */
+.list-wrap.dragging { touch-action: none; }
+
 /* =================================
-   ФОРМА ДОБАВЛЕНИЯ
+   ФОРМА
 ================================= */
 form {
   display: flex;
@@ -73,10 +105,7 @@ form {
   margin: var(--space-4) 0 var(--space-2);
 }
 
-input,
-button,
-select,
-textarea { font-size: 16px; }
+input, button, select, textarea { font-size: 16px; }
 
 form input[type="text"] {
   flex: 1;
@@ -115,7 +144,6 @@ form button[type="submit"] {
   border-radius: var(--radius);
   background: transparent;
 
-  /* плавные перемещения (FLIP) и лёгкие эффекты */
   transition: transform 200ms ease, opacity 200ms ease, background-color 120ms ease;
 }
 
@@ -140,7 +168,7 @@ form button[type="submit"] {
   );
 }
 
-/* Невидимые зоны автоскролла сверху/снизу списка */
+/* Невидимые зоны автоскролла (для десктопного DnD) */
 .scroll-zone { pointer-events: auto; }
 .scroll-zone--top { position: sticky; top: 0; z-index: 1; }
 .scroll-zone--bottom { position: sticky; bottom: 0; z-index: 1; }

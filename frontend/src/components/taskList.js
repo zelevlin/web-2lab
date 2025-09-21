@@ -2,6 +2,7 @@ import { el } from "../utils/dom.js";
 import { store } from "../store/store.js";
 import { TaskItem } from "./taskItem.js";
 import { enableListReorder } from "../features/dnd.js";
+import { enableTouchReorder } from "../features/touch-dnd.js"; // ← добавили
 import { capturePositions, animateReorder } from "../utils/flip.js";
 
 export function TaskList() {
@@ -29,11 +30,20 @@ export function TaskList() {
     lastPositions = capturePositions(list);
   }
 
-  // даём внешнему миру способ попросить перерисовку
+  // внешняя перерисовка по запросу
   list._render = redrawWithAnimation;
 
-  // DnD «между элементами»
+  // DnD «между элементами» (десктоп)
   enableListReorder(list, {
+    onReorder: ({ fromId, beforeId }) => {
+      lastPositions = capturePositions(list);
+      store.moveBeforeId(fromId, beforeId);
+      redrawWithAnimation();
+    },
+  });
+
+  // Touch/Pointer DnD (мобильные, long-press)
+  enableTouchReorder(list, {
     onReorder: ({ fromId, beforeId }) => {
       lastPositions = capturePositions(list);
       store.moveBeforeId(fromId, beforeId);
