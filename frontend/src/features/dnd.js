@@ -29,19 +29,23 @@ export function enableListReorder(listEl, { onReorder }) {
   });
 
   listEl.addEventListener("dragover", (e) => {
-    // Разрешаем drop и двигаем placeholder
-    e.preventDefault();
-    if (!draggingId) return;
+  e.preventDefault();
+  if (!draggingId) return;
 
-    const after = getElementAfterY(listEl, e.clientY);
-    if (!after) {
-      if (placeholder.parentNode !== listEl || placeholder.nextElementSibling) {
-        listEl.appendChild(placeholder);
-      }
-    } else if (after !== placeholder) {
-      listEl.insertBefore(placeholder, after);
-    }
-  });
+  // авто-скролл у краёв контейнера
+  const rect = listEl.getBoundingClientRect();
+  const edge = 24; // зона у краёв, px
+  if (e.clientY - rect.top < edge) listEl.scrollTop -= 12;
+  else if (rect.bottom - e.clientY < edge) listEl.scrollTop += 12;
+
+  const after = getElementAfterY(listEl, e.clientY);
+  if (!after) {
+    if (placeholder.parentNode !== listEl || placeholder.nextElementSibling)
+      listEl.appendChild(placeholder);
+  } else if (after !== placeholder) {
+    listEl.insertBefore(placeholder, after);
+  }
+});
 
   // Drop оставляем (на случай, если отпустили прямо над списком)
   listEl.addEventListener("drop", (e) => {

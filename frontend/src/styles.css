@@ -1,6 +1,6 @@
-/* ================================
-   БАЗА
-================================ */
+/* =================================
+   БАЗА И ПЕРЕМЕННЫЕ
+================================= */
 :root {
   color-scheme: light dark;
 
@@ -12,6 +12,7 @@
 
   --radius: 10px;
   --border: 1px solid #d0d0d0;
+
   --muted: #6b7280;
   --danger: #b00020;
   --accent: #3b82f6;
@@ -19,29 +20,63 @@
 
 * { box-sizing: border-box; }
 
+html, body { height: 100%; }
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  min-height: 100vh;
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-header, main, footer {
+/* =================================
+   КОНТЕЙНЕРЫ
+================================= */
+header, footer {
+  flex: 0 0 auto;
   width: 100%;
   max-width: var(--maxw);
   padding: var(--space-4);
   margin: 0 auto;
 }
 
-/* ================================
+main {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--maxw);
+  padding: var(--space-4);
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0; /* важно: разрешаем детям сжиматься */
+}
+
+/* Прокручиваемая оболочка для списка */
+.list-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px; /* под скроллбар */
+}
+
+/* =================================
    ФОРМА ДОБАВЛЕНИЯ
-================================ */
+================================= */
 form {
   display: flex;
   gap: var(--space-2);
-  margin: var(--space-4) 0;
+  margin: var(--space-4) 0 var(--space-2);
 }
+
+input,
+button,
+select,
+textarea { font-size: 16px; }
 
 form input[type="text"] {
   flex: 1;
@@ -58,16 +93,10 @@ form button[type="submit"] {
   background: transparent;
   cursor: pointer;
 }
-input,
-button,
-select,
-textarea {
-  font-size: 16px;
-}
 
-/* ================================
+/* =================================
    СПИСОК ЗАДАЧ
-================================ */
+================================= */
 #task-list {
   list-style: none;
   padding: 0;
@@ -76,8 +105,8 @@ textarea {
 
 #task-list li {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 
   padding: var(--space-3) var(--space-4);
   margin-bottom: var(--space-2);
@@ -86,11 +115,17 @@ textarea {
   border-radius: var(--radius);
   background: transparent;
 
-  /* ВАЖНО: анимация перемещения */
-  transition: transform 300ms ease, opacity 200ms ease, background-color 120ms ease;
+  /* плавные перемещения (FLIP) и лёгкие эффекты */
+  transition: transform 200ms ease, opacity 200ms ease, background-color 120ms ease;
 }
 
-/* Визуальный промежуток для вставки */
+#task-list li:hover {
+  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
+}
+
+#task-list li.dragging { opacity: 0.5; }
+
+/* Промежуток вставки при DnD */
 .drop-placeholder {
   height: 10px;
   margin: var(--space-2) 0;
@@ -105,15 +140,14 @@ textarea {
   );
 }
 
-/* Состояния DnD */
-#task-list li.dragging { opacity: 0.5; }
+/* Невидимые зоны автоскролла сверху/снизу списка */
+.scroll-zone { pointer-events: auto; }
+.scroll-zone--top { position: sticky; top: 0; z-index: 1; }
+.scroll-zone--bottom { position: sticky; bottom: 0; z-index: 1; }
 
-/* Лёгкий hover */
-#task-list li:hover {
-  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
-}
-
-/* Кнопка удаления */
+/* =================================
+   ПРОЧЕЕ
+================================= */
 button.delete {
   border: 0;
   background: transparent;

@@ -1,8 +1,9 @@
 import { el, mount } from "./utils/dom.js";
 import { TaskForm } from "./components/taskForm.js";
 import { TaskList } from "./components/taskList.js";
+import { enableAutoScrollZones } from "./features/autoscroll.js"; // ← НОВОЕ
 
-// подключаем стили динамически (index.html остаётся только со <script type="module">)
+// подключаем стили динамически
 (() => {
   const link = document.createElement("link");
   link.rel = "stylesheet";
@@ -18,6 +19,10 @@ import { TaskList } from "./components/taskList.js";
   const list = TaskList();
   const form = TaskForm(() => list._render?.());
 
-  mount(main, form, list);
+  const listWrap = el("div", { className: "list-wrap" }, list);
+  mount(main, form, listWrap);
   mount(document.body, header, main, footer);
+
+  // Включаем зоны автопрокрутки именно на прокручиваемом контейнере
+  enableAutoScrollZones(listWrap, { zoneHeight: 44 });
 })();
