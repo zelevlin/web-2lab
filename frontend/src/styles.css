@@ -1,0 +1,49 @@
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+header,
+main,
+footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Вспомогательные классы */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+/* Навигация */
+nav ul {
+  display: flex;
+  gap: 12px;
+
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+/* Список задач */
+#task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
