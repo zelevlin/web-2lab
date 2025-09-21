@@ -12,9 +12,9 @@
 
   --radius: 10px;
   --border: 1px solid #d0d0d0;
-  --muted: #6b7280; /* нейтральный текст */
+  --muted: #6b7280;
   --danger: #b00020;
-  --accent: #3b82f6; /* для подсветок */
+  --accent: #3b82f6;
 }
 
 * { box-sizing: border-box; }
@@ -27,7 +27,6 @@ body {
   align-items: center;
 }
 
-/* Контейнеры */
 header, main, footer {
   width: 100%;
   max-width: var(--maxw);
@@ -81,7 +80,31 @@ form button[type="submit"] {
   border-radius: var(--radius);
   background: transparent;
 
-  transition: background-color 120ms ease;
+  /* ВАЖНО: анимация перемещения */
+  transition: transform 300ms ease, opacity 200ms ease, background-color 120ms ease;
+}
+
+/* Визуальный промежуток для вставки */
+.drop-placeholder {
+  height: 10px;
+  margin: var(--space-2) 0;
+  border-radius: var(--radius);
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--accent) 20%, transparent),
+    transparent
+  );
+}
+
+/* Состояния DnD */
+#task-list li.dragging { opacity: 0.5; }
+
+/* Лёгкий hover */
+#task-list li:hover {
+  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
 }
 
 /* Кнопка удаления */
@@ -92,24 +115,4 @@ button.delete {
   line-height: 1;
   cursor: pointer;
   color: var(--danger);
-}
-
-/* Состояния DnD */
-#task-list li.dragging {
-  opacity: 0.5;
-}
-
-/* Визуальный промежуток для вставки */
-.drop-placeholder {
-  height: 10px;
-  margin: var(--space-2) 0;
-  border-radius: var(--radius);
-  outline: 2px dashed var(--accent);
-  outline-offset: -4px;
-  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 20%, transparent), transparent);
-}
-
-/* Небольшие акценты на hover */
-#task-list li:hover {
-  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
 }

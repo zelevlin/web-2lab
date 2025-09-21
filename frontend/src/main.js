@@ -2,6 +2,7 @@ import { el, mount } from "./utils/dom.js";
 import { store } from "./store/store.js";
 import { createTask } from "./store/taskFactory.js";
 import { enableListReorder } from "./features/dnd.js";
+import { capturePositions, animateReorder } from "./utils/flip.js";
 
 // Подключаем стили динамически
 (() => {
@@ -27,15 +28,10 @@ import { enableListReorder } from "./features/dnd.js";
   const list = el("ul", { id: "task-list" });
   mount(main, form, list);
 
-  // DnD «между элементами»
-  enableListReorder(list, {
-    onReorder: ({ fromId, beforeId }) => {
-      store.moveBeforeId(fromId, beforeId);
-      render();
-    },
-  });
+  let lastPositions = null;
 
   function render() {
+    // перерисовываем без innerHTML
     while (list.firstChild) list.removeChild(list.firstChild);
 
     for (const task of store.get()) {
@@ -43,7 +39,11 @@ import { enableListReorder } from "./features/dnd.js";
       const del = el("button", {
         className: "delete",
         text: "×",
-        onclick: () => { store.remove(task.id); render(); },
+        onclick: () => {
+          lastPositions = capturePositions(list); // Снять «первый кадр»
+          store.remove(task.id);
+          redrawWithAnimation();
+        },
       });
 
       const li = el("li", { draggable: "true", dataset: { id: task.id } }, title, del);
@@ -51,14 +51,31 @@ import { enableListReorder } from "./features/dnd.js";
     }
   }
 
+  function redrawWithAnimation() {
+    render();                                 // отрисовали новую раскладку
+    animateReorder(list, lastPositions);      // проиграли FLIP
+    lastPositions = capturePositions(list);   // запомнили текущие позиции
+  }
+
+  // DnD «между элементами»
+  enableListReorder(list, {
+    onReorder: ({ fromId, beforeId }) => {
+      lastPositions = capturePositions(list); // «первый кадр»
+      store.moveBeforeId(fromId, beforeId);
+      redrawWithAnimation();
+    },
+  });
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const v = input.value.trim();
     if (!v) return;
+    lastPositions = capturePositions(list); // «первый кадр»
     store.add(createTask({ title: v }));
     input.value = "";
-    render();
+    redrawWithAnimation();
   });
 
   render();
+  lastPositions = capturePositions(list); // начальная фиксация
 })();
