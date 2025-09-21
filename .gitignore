@@ -1,0 +1,108 @@
+# --- Node.js ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Env files ---
+.env
+.env.*.local
+*.env.local
+.envrc
+/frontend/.env
+/backend/.env
+
+# --- Logs ---
+logs
+*.log
+*.log.*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# --- Runtime data ---
+tmp/
+temp/
+*.tmp
+*.temp
+
+# --- Coverage / Tests ---
+coverage/
+.nyc_output/
+.vscode-test/
+
+# --- Build output ---
+dist/
+build/
+out/
+.cache/
+.next/
+.nuxt/
+.svelte-kit/
+storybook-static/
+
+# --- Frontend ---
+frontend/.parcel-cache/
+frontend/.vite/
+frontend/.nuxt/
+frontend/dist/
+frontend/build/
+frontend/out/
+
+# --- Backend ---
+backend/.cache/
+backend/dist/
+backend/build/
+
+# --- Database ---
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.sql
+*.dump
+docker-data/
+**/docker-volume/
+**/pgdata/
+
+# --- Docker ---
+/docker-compose.override.yml
+/.docker/
+/.dockerignore
+
+# --- VS Code / IDE ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# --- OS specific ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# --- Misc ---
+*.tgz
+*.gz
+*.zip
+*.tar
+*.rar
+*.7z
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
