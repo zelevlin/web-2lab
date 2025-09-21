@@ -1,49 +1,115 @@
+/* ================================
+   БАЗА
+================================ */
 :root {
   color-scheme: light dark;
+
+  --maxw: 900px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+
+  --radius: 10px;
+  --border: 1px solid #d0d0d0;
+  --muted: #6b7280; /* нейтральный текст */
+  --danger: #b00020;
+  --accent: #3b82f6; /* для подсветок */
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-}
-
-header,
-main,
-footer {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-/* Вспомогательные классы */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  clip: rect(0 0 0 0);
-  overflow: hidden;
-}
-
-/* Навигация */
-nav ul {
   display: flex;
-  gap: 12px;
-
-  list-style: none;
-  padding: 0;
-  margin: 8px 0 0;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Список задач */
+/* Контейнеры */
+header, main, footer {
+  width: 100%;
+  max-width: var(--maxw);
+  padding: var(--space-4);
+  margin: 0 auto;
+}
+
+/* ================================
+   ФОРМА ДОБАВЛЕНИЯ
+================================ */
+form {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+
+form input[type="text"] {
+  flex: 1;
+  padding: var(--space-3);
+  border: var(--border);
+  border-radius: var(--radius);
+  outline: none;
+}
+
+form button[type="submit"] {
+  padding: var(--space-3) var(--space-4);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+/* ================================
+   СПИСОК ЗАДАЧ
+================================ */
 #task-list {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+#task-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-2);
+
+  border: var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+
+  transition: background-color 120ms ease;
+}
+
+/* Кнопка удаления */
+button.delete {
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--danger);
+}
+
+/* Состояния DnD */
+#task-list li.dragging {
+  opacity: 0.5;
+}
+
+/* Визуальный промежуток для вставки */
+.drop-placeholder {
+  height: 10px;
+  margin: var(--space-2) 0;
+  border-radius: var(--radius);
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 20%, transparent), transparent);
+}
+
+/* Небольшие акценты на hover */
+#task-list li:hover {
+  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
 }
