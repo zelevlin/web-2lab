@@ -164,29 +164,36 @@ async function setExpanded(open) {
   if (editing) return;
   editing = true;
 
-  // раскрываем описание, чтобы была видна форма
+  // 1) открыть секцию, чтобы форма была видна
   await setExpanded(true);
 
-  editBar.style.display = "";   // показать форму
+  // 2) показать форму (описание не скрываем)
+  editBar.style.display = "";
   editBtn.style.display = "none";
 
   li.draggable = false;
   li.classList.add("editing");
 
-  // рамки
+  // 3) СРАЗУ подхватить самую свежую задачу и заполнить поля
+  const fresh =
+    (store.getById?.(task.id)) ??
+    (store.get().find(t => t.id === task.id)) ??
+    task;
+
+  titleInput.value = fresh.title;
+  descInput.value = fresh.description ?? "";
+
+  // синхронизируем локальный объект
+  task.title = fresh.title;
+  task.description = fresh.description;
+
+  // 4) теперь играем жёлтую анимацию рамки (форма уже с текстом)
   li.classList.remove("saved-white", "saving-green", "editing-solid", "editing-yellow");
   await playAnimationClass(li, "editing-yellow", "border-fill-up");
   li.classList.remove("editing-yellow");
-  li.classList.add("editing-solid");
+  li.classList.add("editing-solid"); // статичная жёлтая на время редактирования
 
-  // заполнить поля
-  // взять самую свежую версию задачи
-  const fresh = (store.getById?.(task.id)) ?? (store.get().find(t => t.id === task.id)) ?? task;
-  titleInput.value = fresh.title;
-  descInput.value = fresh.description ?? "";
-  // и синхронизируем локальный task на будущее
-  task.title = fresh.title;
-  task.description = fresh.description;
+  // 5) фокус
   titleInput.focus();
 }
 
