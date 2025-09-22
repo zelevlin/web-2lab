@@ -19,6 +19,12 @@ export function TaskList() {
           store.remove(t.id);
           redrawWithAnimation();
         },
+        onChange: () => {
+          // можно без анимации — просто перерисовать,
+          // но оставим анимацию для единообразия
+          lastPositions = capturePositions(list);
+          redrawWithAnimation();
+        },
       });
       list.appendChild(li);
     }

@@ -89,9 +89,8 @@ main {
   padding-right: 4px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;
+  touch-action: pan-y;           /* вертикальный скролл только здесь */
 }
-
 .list-wrap.dragging { touch-action: none; }
 
 /* =================================
@@ -102,7 +101,6 @@ form {
   gap: var(--space-2);
   margin: var(--space-4) 0 var(--space-2);
 }
-
 input, button, select, textarea { font-size: 16px; }
 
 form input[type="text"] {
@@ -112,7 +110,6 @@ form input[type="text"] {
   border-radius: var(--radius);
   outline: none;
 }
-
 form button[type="submit"] {
   padding: var(--space-3) var(--space-4);
   border: var(--border);
@@ -129,7 +126,6 @@ form button[type="submit"] {
   padding: 0;
   margin: 0;
 }
-
 #task-list li {
   display: flex;
   justify-content: space-between;
@@ -144,11 +140,9 @@ form button[type="submit"] {
 
   transition: transform 200ms ease, opacity 200ms ease, background-color 120ms ease;
 }
-
 #task-list li:hover {
   background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
 }
-
 #task-list li.dragging { opacity: 0.5; }
 
 /* Промежуток вставки при DnD */
@@ -167,28 +161,27 @@ form button[type="submit"] {
 }
 
 /* =================================
-   КАРТОЧКИ С ЗАДАЧАМИ
+   КАРТОЧКИ ЗАДАЧ
 ================================= */
 #task-list li.task-item {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: initial;
-  padding: 0;
+  padding: 0; /* отступы внутри .task-row/.task-details */
 }
 
+/* верхняя строка плитки */
 .task-row {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: var(--space-3) var(--space-4);
 }
-
 .task-title {
   flex: 1 1 auto;
   word-break: break-word;
 }
-
 .task-actions {
   margin-left: auto;
   display: flex;
@@ -196,15 +189,16 @@ form button[type="submit"] {
   gap: 8px;
 }
 
+/* кнопки */
 .task-toggle {
   border: var(--border);
   background: transparent;
   border-radius: var(--radius);
-  padding: 4px 8px;
+  padding: 6px 12px;   /* больше кликабельная зона */
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
 }
-
 button.delete {
   border: 0;
   background: transparent;
@@ -223,9 +217,58 @@ button.delete {
   border-top: 1px dashed #e0e0e0;
   transition: max-height 200ms ease, opacity 200ms ease, margin-top 200ms ease;
 }
-
 .task-desc {
   margin: 8px 0 12px;
-  color: var(--muted);
+  color: inherit;       /* читаемый текст описания */
   white-space: pre-wrap;
+}
+
+/* действия внутри раскрытого блока */
+.details-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px var(--space-4) 4px; /* чуть «поднять» кнопку */
+}
+.task-edit {
+  border: var(--border);
+  background: transparent;
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ====== редактирование ====== */
+.task-item.editing { /* optional highlight while editing */ }
+
+.task-editbar {
+  display: grid;
+  gap: 8px;
+  padding: 8px var(--space-4) 12px;
+}
+.edit-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.edit-title,
+.edit-desc {
+  width: 100%;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  font: inherit;
+}
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.task-save,
+.task-cancel {
+  border: var(--border);
+  background: transparent;
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
 }

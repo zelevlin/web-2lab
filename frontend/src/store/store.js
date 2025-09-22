@@ -25,6 +25,12 @@ export const store = {
 
     saveToSession();
   },
+  update(id, patch) {
+    const i = tasks.findIndex((t) => t.id === id);
+    if (i === -1) return;
+    tasks[i] = { ...tasks[i], ...patch };
+    saveToSession();
+  },
 };
 
 // ===== helpers =====
