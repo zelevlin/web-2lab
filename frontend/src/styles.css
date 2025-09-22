@@ -22,7 +22,6 @@
 
 /* =================================
    ГЛОБАЛЬНАЯ ВЫСОТА/СКРОЛЛ
-   (страница не скроллится, скролл только у списка)
 ================================= */
 html {
   height: 100%;
@@ -31,7 +30,7 @@ html {
 }
 
 body {
-  position: fixed;     /* фиксируем страницу в пределах экрана */
+  position: fixed;
   inset: 0;
   margin: 0;
 
@@ -41,16 +40,16 @@ body {
 
   font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 
-  overflow: hidden;          /* запрет скролла страницы */
-  overscroll-behavior: none; /* без резиновой «протяжки» */
-  touch-action: none;        /* жесты на body отключаем */
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 @supports (height: 100dvh) {
   body { height: 100dvh; }
 }
 
-/* когда идёт DnD — запрет выделения текста и подсветки тапа */
+/* во время DnD — запрет выделения текста и подсветки */
 .no-select, .no-select * {
   -webkit-user-select: none;
   user-select: none;
@@ -78,8 +77,8 @@ main {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  min-height: 0;      /* разрешаем детям сжиматься */
-  overflow: hidden;   /* скролл только у .list-wrap */
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Прокручиваемая оболочка для списка */
@@ -87,13 +86,12 @@ main {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  padding-right: 4px;                 /* под скроллбар */
-  -webkit-overflow-scrolling: touch;  /* плавнее на iOS */
-  overscroll-behavior: contain;       /* не тянуть всю страницу */
-  touch-action: pan-y;                /* на мобилках — вертикальный скролл только тут */
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
-/* во время перетаскивания карточки — блокируем нативный скролл списка */
 .list-wrap.dragging { touch-action: none; }
 
 /* =================================
@@ -168,14 +166,45 @@ form button[type="submit"] {
   );
 }
 
-/* Невидимые зоны автоскролла (для десктопного DnD) */
-.scroll-zone { pointer-events: auto; }
-.scroll-zone--top { position: sticky; top: 0; z-index: 1; }
-.scroll-zone--bottom { position: sticky; bottom: 0; z-index: 1; }
-
 /* =================================
-   ПРОЧЕЕ
+   КАРТОЧКИ С ЗАДАЧАМИ
 ================================= */
+#task-list li.task-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: initial;
+  padding: 0;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.task-title {
+  flex: 1 1 auto;
+  word-break: break-word;
+}
+
+.task-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-toggle {
+  border: var(--border);
+  background: transparent;
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  line-height: 1;
+  cursor: pointer;
+}
+
 button.delete {
   border: 0;
   background: transparent;
@@ -183,4 +212,20 @@ button.delete {
   line-height: 1;
   cursor: pointer;
   color: var(--danger);
+}
+
+/* раскрывающийся блок */
+.task-details {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 var(--space-4);
+  border-top: 1px dashed #e0e0e0;
+  transition: max-height 200ms ease, opacity 200ms ease, margin-top 200ms ease;
+}
+
+.task-desc {
+  margin: 8px 0 12px;
+  color: var(--muted);
+  white-space: pre-wrap;
 }
