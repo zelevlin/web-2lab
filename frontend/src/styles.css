@@ -248,14 +248,27 @@ button.delete {
   font-size: 12px;
   color: var(--muted);
 }
-.edit-title,
-.edit-desc {
-  width: 100%;
-  border: var(--border);
-  border-radius: var(--radius);
-  padding: 8px;
-  font: inherit;
-  resize: none;
+/* чтобы контент внутри мог сжиматься в колонке плитки */
+.task-details { 
+  min-width: 0;      /* <-- ключ! */
+  max-width: 100%;
+}
+
+/* текст описания всегда переносится, даже длинные слова/URL */
+.task-desc {
+  margin: 8px 0 12px;
+  color: inherit;
+  white-space: pre-wrap;      /* сохраняем переводы строк пользователя */
+  overflow-wrap: anywhere;    /* переносить в любом месте при необходимости */
+  word-break: break-word;     /* совместимость со старыми движками */
+}
+
+/* на всякий: заголовок тоже не выползает при длинной строке */
+.task-title {
+  flex: 1 1 auto;
+  min-width: 0;               /* <-- позволяет тексту сжиматься */
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .edit-actions {
   display: flex;
@@ -283,26 +296,34 @@ button.delete {
 }
 
 /* Визуальная бегущая рамка поверх, не блокирует клики */
+/* Режим редактирования — только анимированная зелёная рамка */
+#task-list li.task-item.editing {
+  position: relative;
+  border: var(--border); /* стандартная рамка как у обычных */
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease,
+    background-color 120ms ease,
+    border-color 450ms ease;
+}
+
 #task-list li.task-item.editing::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: var(--radius);
-  pointer-events: none;               /* ← ключ: не перехватывает события */
-  z-index: 0;                         /* держим ниже контента */
+  pointer-events: none;   /* не мешает кликам */
+  z-index: 1;
 
-  /* рисуем обводку как бордер псевдоэлемента */
-  border: 2px solid #22c55e;
-
-  /* показываем сторону за стороной */
+  border: 2px solid #22c55e; /* ярко-зелёная обводка */
   clip-path: inset(0 100% 0 0);
   animation: border-sweep 900ms linear forwards;
 }
 
 @keyframes border-sweep {
-  0%   { clip-path: inset(0 100% 0 0); }   /* показана левая грань */
-  25%  { clip-path: inset(0 0 100% 0); }   /* верх */
-  50%  { clip-path: inset(100% 0 0 0); }   /* правая */
-  75%  { clip-path: inset(0 0 0 100%); }   /* низ */
-  100% { clip-path: inset(0 0 0 0); }      /* вся рамка (совпадает с border) */
+  0%   { clip-path: inset(0 100% 0 0); }
+  25%  { clip-path: inset(0 0 100% 0); }
+  50%  { clip-path: inset(100% 0 0 0); }
+  75%  { clip-path: inset(0 0 0 100%); }
+  100% { clip-path: inset(0 0 0 0); }
 }
