@@ -139,54 +139,66 @@ export function TaskItem(task, { onDelete, onChange } = {}) {
   setExpanded(false);
 
   // --- поведение ---
-  async function setExpanded(open) {
-    if (expanded === open) return;
-    expanded = open;
-    toggleBtn.setAttribute("aria-expanded", String(open));
-    toggleBtn.textContent = open ? "▴" : "▾";
-    details.setAttribute("aria-hidden", String(!open));
-    li.classList.toggle("is-open", open);
-    await animateHeight(details, open);
+async function setExpanded(open) {
+  if (expanded === open) return;
+
+  // если сворачиваем при активном редактировании — отменяем редактирование
+  if (!open && editing) {
+    li.classList.remove("editing-solid", "editing-yellow", "saving-green", "saved-white");
+    exitEdit(); // прячет форму, восстанавливает draggable и т.п.
   }
+
+  expanded = open;
+  toggleBtn.setAttribute("aria-expanded", String(open));
+  toggleBtn.textContent = open ? "▴" : "▾";
+
+  // семантика + класс для стилей
+  details.setAttribute("aria-hidden", String(!open));
+  li.classList.toggle("is-open", open);
+
+  // плавная анимация высоты через WAAPI
+  await animateHeight(details, open);
+}
 
   async function enterEdit() {
-    if (editing) return;
-    editing = true;
+  if (editing) return;
+  editing = true;
 
-    // раскрываем описание, чтобы была видна форма
-    await setExpanded(true);
+  // раскрываем описание, чтобы была видна форма
+  await setExpanded(true);
 
-    editBar.style.display = "";
-    descP.style.display = "none";
-    editBtn.style.display = "none";
+  editBar.style.display = "";   // показать форму
+  editBtn.style.display = "none";
 
-    li.draggable = false;
-    li.classList.add("editing");
+  li.draggable = false;
+  li.classList.add("editing");
 
-    // очистить прошлые рамки и сыграть жёлтую «снизу вверх»
-    li.classList.remove("saved-white", "saving-green", "editing-solid", "editing-yellow");
-    await playAnimationClass(li, "editing-yellow", "border-fill-up");
-    li.classList.remove("editing-yellow");
-    li.classList.add("editing-solid"); // статичная жёлтая на время редактирования
+  // рамки
+  li.classList.remove("saved-white", "saving-green", "editing-solid", "editing-yellow");
+  await playAnimationClass(li, "editing-yellow", "border-fill-up");
+  li.classList.remove("editing-yellow");
+  li.classList.add("editing-solid");
 
-    // заполнить поля и сфокусироваться
-    titleInput.value = task.title;
-    descInput.value = task.description ?? "";
-    titleInput.focus();
-  }
+  // заполнить поля
+  // взять самую свежую версию задачи
+  const fresh = (store.getById?.(task.id)) ?? (store.get().find(t => t.id === task.id)) ?? task;
+  titleInput.value = fresh.title;
+  descInput.value = fresh.description ?? "";
+  // и синхронизируем локальный task на будущее
+  task.title = fresh.title;
+  task.description = fresh.description;
+  titleInput.focus();
+}
 
   function exitEdit() {
-    editing = false;
+  editing = false;
 
-    // прячем только форму, секцию описания НЕ закрываем
-    editBar.style.display = "none";
-    descP.style.display = "";
-    editBtn.style.display = "";
+  editBar.style.display = "none"; // прячем только форму
+  editBtn.style.display = "";
 
-    li.draggable = true;
-    li.classList.remove("editing");
-    // рамочные классы управляются в save/cancel
-  }
+  li.draggable = true;
+  li.classList.remove("editing");
+}
 
   // Сохранить: анимируем зелёную рамку, прячем форму, описание остаётся открытым
   saveBtn.onclick = async (e) => {
@@ -200,6 +212,9 @@ export function TaskItem(task, { onDelete, onChange } = {}) {
     title.textContent = newTitle;
     descP.textContent = newDesc?.trim() ? newDesc : "Нет описания";
 
+    // держим локальный объект в актуальном состоянии
+    task.title = newTitle;
+    task.description = newDesc;
     // снять жёлтое состояние; запустить зелёный «оббегающий» контур
     li.classList.remove("editing-solid", "editing-yellow", "saved-white", "saving-green");
     await playAnimationClass(li, "saving-green", "border-sweep");
