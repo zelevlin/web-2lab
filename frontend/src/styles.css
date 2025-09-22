@@ -239,8 +239,6 @@ button.delete {
 }
 
 /* ====== редактирование ====== */
-.task-item.editing { /* optional highlight while editing */ }
-
 .task-editbar {
   display: grid;
   gap: 8px;
@@ -272,4 +270,39 @@ button.delete {
   border-radius: var(--radius);
   padding: 6px 10px;
   cursor: pointer;
+}
+/* Режим редактирования — зелёная рамка + «оббегающая» анимация */
+#task-list li.task-item.editing {
+  position: relative;
+  border: 2px solid #22c55e;         /* реальная рамка остаётся кликабельной */
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease,
+    background-color 120ms ease,
+    border-color 450ms ease;
+}
+
+/* Визуальная бегущая рамка поверх, не блокирует клики */
+#task-list li.task-item.editing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  pointer-events: none;               /* ← ключ: не перехватывает события */
+  z-index: 0;                         /* держим ниже контента */
+
+  /* рисуем обводку как бордер псевдоэлемента */
+  border: 2px solid #22c55e;
+
+  /* показываем сторону за стороной */
+  clip-path: inset(0 100% 0 0);
+  animation: border-sweep 900ms linear forwards;
+}
+
+@keyframes border-sweep {
+  0%   { clip-path: inset(0 100% 0 0); }   /* показана левая грань */
+  25%  { clip-path: inset(0 0 100% 0); }   /* верх */
+  50%  { clip-path: inset(100% 0 0 0); }   /* правая */
+  75%  { clip-path: inset(0 0 0 100%); }   /* низ */
+  100% { clip-path: inset(0 0 0 0); }      /* вся рамка (совпадает с border) */
 }
