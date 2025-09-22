@@ -1,4 +1,4 @@
-/* =================================
+/* ================================
    БАЗА И ПЕРЕМЕННЫЕ
 ================================= */
 :root {
@@ -20,7 +20,7 @@
 
 * { box-sizing: border-box; }
 
-/* =================================
+/* ================================
    ГЛОБАЛЬНАЯ ВЫСОТА/СКРОЛЛ
 ================================= */
 html {
@@ -28,7 +28,6 @@ html {
   overflow: hidden;
   overscroll-behavior: none;
 }
-
 body {
   position: fixed;
   inset: 0;
@@ -44,10 +43,7 @@ body {
   overscroll-behavior: none;
   touch-action: none;
 }
-
-@supports (height: 100dvh) {
-  body { height: 100dvh; }
-}
+@supports (height: 100dvh) { body { height: 100dvh; } }
 
 /* во время DnD — запрет выделения текста и подсветки */
 .no-select, .no-select * {
@@ -56,7 +52,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* =================================
+/* ================================
    КАРКАС
 ================================= */
 header, footer {
@@ -66,7 +62,6 @@ header, footer {
   padding: var(--space-4);
   margin: 0 auto;
 }
-
 main {
   flex: 1 1 auto;
   width: 100%;
@@ -81,7 +76,7 @@ main {
   overflow: hidden;
 }
 
-/* Прокручиваемая оболочка для списка */
+/* скроллим ТОЛЬКО список */
 .list-wrap {
   flex: 1 1 auto;
   min-height: 0;
@@ -89,11 +84,11 @@ main {
   padding-right: 4px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;           /* вертикальный скролл только здесь */
+  touch-action: pan-y;
 }
 .list-wrap.dragging { touch-action: none; }
 
-/* =================================
+/* ================================
    ФОРМА
 ================================= */
 form {
@@ -102,7 +97,6 @@ form {
   margin: var(--space-4) 0 var(--space-2);
 }
 input, button, select, textarea { font-size: 16px; }
-
 form input[type="text"] {
   flex: 1;
   padding: var(--space-3);
@@ -118,14 +112,10 @@ form button[type="submit"] {
   cursor: pointer;
 }
 
-/* =================================
+/* ================================
    СПИСОК ЗАДАЧ
 ================================= */
-#task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+#task-list { list-style: none; padding: 0; margin: 0; }
 #task-list li {
   display: flex;
   justify-content: space-between;
@@ -140,27 +130,20 @@ form button[type="submit"] {
 
   transition: transform 200ms ease, opacity 200ms ease, background-color 120ms ease;
 }
-#task-list li:hover {
-  background: color-mix(in oklab, Canvas 90%, var(--accent) 10%);
-}
+#task-list li:hover { background: color-mix(in oklab, Canvas 90%, var(--accent) 10%); }
 #task-list li.dragging { opacity: 0.5; }
 
-/* Промежуток вставки при DnD */
+/* промежуток вставки при DnD */
 .drop-placeholder {
   height: 10px;
   margin: var(--space-2) 0;
   border-radius: var(--radius);
   outline: 2px dashed var(--accent);
   outline-offset: -4px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--accent) 20%, transparent),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--accent) 20%, transparent), transparent);
 }
 
-/* =================================
+/* ================================
    КАРТОЧКИ ЗАДАЧ
 ================================= */
 #task-list li.task-item {
@@ -168,7 +151,8 @@ form button[type="submit"] {
   flex-direction: column;
   align-items: stretch;
   justify-content: initial;
-  padding: 0; /* отступы внутри .task-row/.task-details */
+  padding: 0; /* внутренние паддинги у .task-row / .task-details */
+  will-change: clip-path, border-color;
 }
 
 /* верхняя строка плитки */
@@ -180,7 +164,9 @@ form button[type="submit"] {
 }
 .task-title {
   flex: 1 1 auto;
+  min-width: 0;
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .task-actions {
   margin-left: auto;
@@ -194,7 +180,7 @@ form button[type="submit"] {
   border: var(--border);
   background: transparent;
   border-radius: var(--radius);
-  padding: 6px 12px;   /* больше кликабельная зона */
+  padding: 6px 12px;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -208,26 +194,33 @@ button.delete {
   color: var(--danger);
 }
 
-/* раскрывающийся блок */
+/* раскрывающийся блок (анимация высоты — из JS/WAAPI) */
 .task-details {
-  overflow: hidden;
-  max-height: 0;
+  overflow: clip;         /* не вылезать при анимации высоты */
+  height: 0;
   opacity: 0;
   padding: 0 var(--space-4);
   border-top: 1px dashed #e0e0e0;
-  transition: max-height 200ms ease, opacity 200ms ease, margin-top 200ms ease;
+
+  min-width: 0;
+  max-width: 100%;
 }
+.task-item.is-open .task-details { opacity: 1; }
+
+/* текст описания — переносы */
 .task-desc {
   margin: 8px 0 12px;
-  color: inherit;       /* читаемый текст описания */
+  color: inherit;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* действия внутри раскрытого блока */
+/* действия внизу описания */
 .details-actions {
   display: flex;
   justify-content: flex-end;
-  padding: 8px var(--space-4) 4px; /* чуть «поднять» кнопку */
+  padding: 8px var(--space-4) 4px;
 }
 .task-edit {
   border: var(--border);
@@ -238,37 +231,21 @@ button.delete {
   cursor: pointer;
 }
 
-/* ====== редактирование ====== */
+/* редактор */
 .task-editbar {
   display: grid;
   gap: 8px;
   padding: 8px var(--space-4) 12px;
 }
-.edit-label {
-  font-size: 12px;
-  color: var(--muted);
-}
-/* чтобы контент внутри мог сжиматься в колонке плитки */
-.task-details { 
-  min-width: 0;      /* <-- ключ! */
-  max-width: 100%;
-}
-
-/* текст описания всегда переносится, даже длинные слова/URL */
-.task-desc {
-  margin: 8px 0 12px;
-  color: inherit;
-  white-space: pre-wrap;      /* сохраняем переводы строк пользователя */
-  overflow-wrap: anywhere;    /* переносить в любом месте при необходимости */
-  word-break: break-word;     /* совместимость со старыми движками */
-}
-
-/* на всякий: заголовок тоже не выползает при длинной строке */
-.task-title {
-  flex: 1 1 auto;
-  min-width: 0;               /* <-- позволяет тексту сжиматься */
-  word-break: break-word;
-  overflow-wrap: anywhere;
+.edit-label { font-size: 12px; color: var(--muted); }
+.edit-title,
+.edit-desc {
+  width: 100%;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  font: inherit;
+  resize: none;
 }
 .edit-actions {
   display: flex;
@@ -276,54 +253,49 @@ button.delete {
   justify-content: flex-end;
   margin-top: 4px;
 }
-.task-save,
-.task-cancel {
+.task-save, .task-cancel {
   border: var(--border);
   background: transparent;
   border-radius: var(--radius);
   padding: 6px 10px;
   cursor: pointer;
 }
-/* Режим редактирования — зелёная рамка + «оббегающая» анимация */
-#task-list li.task-item.editing {
-  position: relative;
-  border: 2px solid #22c55e;         /* реальная рамка остаётся кликабельной */
-  transition:
-    transform 200ms ease,
-    opacity 200ms ease,
-    background-color 120ms ease,
-    border-color 450ms ease;
+
+/* === Рамки/анимации === */
+
+/* Жёлтая при входе в редактирование: снизу вверх */
+#task-list li.task-item.editing-yellow { position: relative; }
+#task-list li.task-item.editing-yellow::after {
+  content: ""; position: absolute; inset: 0; border-radius: var(--radius);
+  pointer-events: none;
+  border: 2px solid #facc15;  /* amber-400 */
+  clip-path: inset(0 0 100% 0);
+  animation: border-fill-up 600ms ease forwards;
 }
+@keyframes border-fill-up { to { clip-path: inset(0 0 0 0); } }
 
-/* Визуальная бегущая рамка поверх, не блокирует клики */
-/* Режим редактирования — только анимированная зелёная рамка */
-#task-list li.task-item.editing {
-  position: relative;
-  border: var(--border); /* стандартная рамка как у обычных */
-  transition:
-    transform 200ms ease,
-    opacity 200ms ease,
-    background-color 120ms ease,
-    border-color 450ms ease;
-}
+/* статичная жёлтая рамка, пока редактируем */
+#task-list li.task-item.editing-solid { border: 2px solid #facc15; }
 
-#task-list li.task-item.editing::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius);
-  pointer-events: none;   /* не мешает кликам */
-  z-index: 1;
-
-  border: 2px solid #22c55e; /* ярко-зелёная обводка */
+/* Зелёная при сохранении: оббегающая по периметру */
+#task-list li.task-item.saving-green { position: relative; }
+#task-list li.task-item.saving-green::after {
+  content: ""; position: absolute; inset: 0; border-radius: var(--radius);
+  pointer-events: none;
+  border: 2px solid #22c55e;  /* green-500 */
   clip-path: inset(0 100% 0 0);
   animation: border-sweep 900ms linear forwards;
 }
-
 @keyframes border-sweep {
   0%   { clip-path: inset(0 100% 0 0); }
   25%  { clip-path: inset(0 0 100% 0); }
   50%  { clip-path: inset(100% 0 0 0); }
   75%  { clip-path: inset(0 0 0 100%); }
   100% { clip-path: inset(0 0 0 0); }
+}
+
+/* финал — белая рамка на короткое время */
+#task-list li.task-item.saved-white {
+  border: 2px solid #fff;
+  transition: border-color 300ms ease;
 }
