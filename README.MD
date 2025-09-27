@@ -9,7 +9,7 @@ src/
 ├── lib/                   # мелкие утилиты и UI-хелперы
 │   ├── dom.js             # el(), mount(), replaceChildren()
 │   ├── ui-kit.js          # opt(), select(), row(), inputText(), ...
-│   └── local-commands.js  # мини-command bus для компонента (локальные действия)
+│   └── local-commands.js  # мини-command bus для компонента
 │
 ├── ui/                    # общие UI-компоненты
 │   ├── Layout.js          # header/footer/main
@@ -17,13 +17,13 @@ src/
 │
 ├── features/              # отдельные "фичи" приложения
 │   └── todos/
-│       ├── model.js       # бизнес-логика задач (add/toggle/remove/update)
-│       ├── service.js     # работа с API (fetch) — пока пустышка
-│       ├── filters.js     # словари фильтров (all/active/done)
-│       ├── sorters.js     # словари сортировок (по дате, названию, сроку)
-│       └── view/          # всё, что связано с отображением todo
-│           ├── index.js   # собирает весь экран (createTodosView)
-│           ├── composer.js# форма создания/редактирования задачи (локальные команды)
-│           └── card.js    # карточка задачи (рендер одной задачи)
+│       ├── model.js       # бизнес-логика задач
+│       ├── service.js     # работа с API
+│       ├── filters.js     # словари фильтров
+│       ├── sorters.js     # словари сортировок
+│       └── view/
+│           ├── index.js   # экран (createTodosView)
+│           ├── composer.js# форма создания/редактирования
+│           └── card.js    # карточка задачи
 │
-└── main.js                # точка входа: склейка layout + router + features
+└── main.js                # точка входа
