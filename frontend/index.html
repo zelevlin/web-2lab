@@ -1,12 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>ToDo App</title>
-  </head>
-  <body>
-    <script type="module" src="src/main.js"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- рантайм-конфиг (может быть перезаписан nginx/беком) -->
+  <script id="app-config" type="application/json">
+    { "API_BASE": "/api" }
+  </script>
+  <link rel="stylesheet" href="./src/styles/base.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
 </html>
-<!-- ToDo если текста слишком много он не влезает в задачу - сделать перенос -->
