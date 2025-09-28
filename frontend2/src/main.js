@@ -1,4 +1,4 @@
-//склейка всего воедино
+// склейка всего воедино
 import { createBus } from './core/bus.js';
 import { createStore } from './core/store.js';
 import { createRouter } from './core/router.js';
@@ -17,7 +17,7 @@ console.log('Config:', cfg);
 
 try {
   console.log('before createLayout');
-  const layout = createLayout();
+  const layout = createLayout(); // layout живет внутри try
   console.log('after createLayout', layout);
 
   const host = document.getElementById('app');
@@ -30,7 +30,7 @@ try {
   enableButtonDelegation(document);
   console.log('Delegation enabled');
 
-  // Роутинг
+  // Роутинг 
   function renderRoute() {
     const main = layout.getMain();
     if (!main) throw new Error('layout.getMain() returned null/undefined');
@@ -45,24 +45,10 @@ try {
       main.append(document.createTextNode('About page…'));
     }
   }
+
   renderRoute();
   router.onChange(renderRoute);
+
 } catch (e) {
   console.error('BOOT ERROR:', e);
 }
-// Роутинг
-function renderRoute() {
-  const main = layout.getMain();
-  main.replaceChildren();
-  const path = router.current();
-
-  if (path === '/') {
-    const model = createTodoModel(store);
-    const view = createTodosView(store, model);
-    main.append(view.el);
-  } else if (path === '/about') {
-    main.append(document.createTextNode('About page…'));
-  }
-}
-renderRoute();
-router.onChange(renderRoute);
