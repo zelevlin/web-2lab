@@ -6,49 +6,102 @@ import { createComposer } from './composer.js';
 import { renderCard } from './card.js';
 import { filters } from '../filters.js';
 import { sorters } from '../sorters.js';
+import { attachDnd } from './dnd.js';
 
 export function createTodosView(store, model) {
-  const root = el('section', { class:'container' });
+  const root = el('section', { class: 'container' });
 
-  // toolbar row 1
-  const addBtn = new Button({ label:'Добавить', action:'todo:add', variant:'primary' });
-  const search = el('input', { class:'input', type:'search', placeholder:'Поиск по названию…', 'aria-label':'Поиск по названию' });
-  const status = select([['all','Все'],['active','Невыполненные'],['done','Выполненные']], { class:'select', 'aria-label':'Фильтр по статусу' });
-  const toolbar = el('div', { class:'toolbar' }, addBtn.el, search, status);
+  // --- Toolbar row 1: Добавить / Поиск / Фильтр ---
+  const addBtn = new Button({ label: 'Добавить', action: 'todo:add', variant: 'primary' });
+  const search = el('input', {
+    class: 'input',
+    type: 'search',
+    placeholder: 'Поиск по названию…',
+    'aria-label': 'Поиск по названию'
+  });
+  const status = select(
+    [['all', 'Все'], ['active', 'Невыполненные'], ['done', 'Выполненные']],
+    { class: 'select', 'aria-label': 'Фильтр по статусу' }
+  );
+  const toolbar = el('div', { class: 'toolbar' }, addBtn.el, search, status);
 
-  // toolbar row 2
-  const sortBy  = select([['createdAt','По созданию'],['due','По сроку'],['title','По названию']], { class:'select', 'aria-label':'Поле сортировки' });
-  const sortDir = select([['desc','По убыванию'],['asc','По возрастанию']], { class:'select', 'aria-label':'Порядок' });
-  const prioritize = el('label',{ class:'label' }, el('input',{ type:'checkbox', id:'prioritize' }), ' Сначала невыполненные');
-  const toolbar2 = el('div',{ class:'toolbar__row' }, el('span',{class:'label',textContent:'Сортировка:'}), sortBy, sortDir, prioritize);
+  // --- Toolbar row 2: Сортировки ---
+  const sortBy = select(
+    [
+      ['order', 'Ручной порядок'], // DnD работает поверх этого сортировщика
+      ['createdAt', 'По созданию'],
+      ['due', 'По сроку'],
+      ['title', 'По названию']
+    ],
+    { class: 'select', 'aria-label': 'Поле сортировки' }
+  );
+  const sortDir = select(
+    [['desc', 'По убыванию'], ['asc', 'По возрастанию']],
+    { class: 'select', 'aria-label': 'Порядок' }
+  );
+  const prioritize = el(
+    'label',
+    { class: 'label' },
+    el('input', { type: 'checkbox', id: 'prioritize' }),
+    ' Сначала невыполненные'
+  );
+  const toolbar2 = el(
+    'div',
+    { class: 'toolbar__row' },
+    el('span', { class: 'label', textContent: 'Сортировка:' }),
+    sortBy,
+    sortDir,
+    prioritize
+  );
 
-  // composer
+  // --- Composer: форма добавления/редактирования ---
   const composer = createComposer({
     onSave: (payload, id) => {
-      if (id) model.update(id, payload); // редактирование
-      else model.add(payload);           // новая задача
+      if (id) model.update(id, payload);
+      else model.add(payload);
     },
     onCancel: () => {}
   });
 
-  // list
-  const viewport = el('div',{ class:'todos__viewport' });
-  const listwrap = el('div',{ class:'todos__listwrap' });
-  const list     = el('ul',{ class:'todos__list' });
-  listwrap.append(list); viewport.append(listwrap);
+  // --- Список задач ---
+  const viewport = el('div', { class: 'todos__viewport' });
+  const listwrap = el('div', { class: 'todos__listwrap' });
+  const list = el('ul', { class: 'todos__list' });
+  listwrap.append(list);
+  viewport.append(list);
 
   root.append(toolbar, toolbar2, composer.el, viewport);
 
-  // UI-state
-  const ui = { q:'', status:'all', sortBy:'createdAt', sortDir:'desc', prioritize:false };
+  // --- UI state ---
+  // По умолчанию включаем «ручной порядок», чтобы DnD сразу был ожидаемо консистентен.
+  const ui = { q: '', status: 'all', sortBy: 'order', sortDir: 'asc', prioritize: false };
 
-  // handlers
-  search.addEventListener('input', () => { ui.q = search.value.trim().toLowerCase(); render(); });
-  status.addEventListener('change', () => { ui.status = status.value; render(); });
-  sortBy.addEventListener('change', () => { ui.sortBy = sortBy.value; render(); });
-  sortDir.addEventListener('change', () => { ui.sortDir = sortDir.value; render(); });
-  prioritize.querySelector('input').addEventListener('change', (e) => { ui.prioritize = e.target.checked; render(); });
+  // --- Фильтры/сортировки ---
+  search.addEventListener('input', () => {
+    ui.q = search.value.trim().toLowerCase();
+    render();
+  });
+  status.addEventListener('change', () => {
+    ui.status = status.value;
+    render();
+  });
+  sortBy.addEventListener('change', () => {
+    ui.sortBy = sortBy.value;
+    render();
+  });
+  sortDir.addEventListener('change', () => {
+    ui.sortDir = sortDir.value;
+    render();
+  });
+  prioritize.querySelector('input').addEventListener('change', (e) => {
+    ui.prioritize = e.target.checked;
+    render();
+  });
 
+  // --- Подключаем DnD к списку ---
+  attachDnd({ list, store });
+
+  // --- Рендер ---
   function render() {
     const { todos = [] } = store.get();
     const dir = ui.sortDir === 'asc' ? 1 : -1;
@@ -71,32 +124,38 @@ export function createTodosView(store, model) {
       return;
     }
 
-    final.forEach((t) => list.append(renderCard(t)));
+    final.forEach((t) => {
+      const card = renderCard(t);
+      // DnD: карточка должна быть draggable и иметь data-id
+      card.setAttribute('draggable', 'true');
+      card.dataset.id = t.id;
+      list.append(card);
+    });
   }
 
-  // подписка на стор и первый рендер
+  // --- Подписка на store и первый рендер ---
   const unsub = store.subscribe(render);
   render();
 
-  // команды
+  // --- Команды ---
   register('todo:add', () => composer.open());
 
   register('todo:edit', ({ target }) => {
     const id = target.getAttribute('data-id');
     if (!id) return;
-    const { todos=[] } = store.get();
-    const todo = todos.find(t => t.id === id);
-    if (todo) composer.open(todo);   // открываем форму уже с данными
+    const { todos = [] } = store.get();
+    const todo = todos.find((t) => t.id === id);
+    if (todo) composer.open(todo);
   });
 
-  register('todo:remove', ({ target }) => { 
-    const id = target.getAttribute('data-id'); 
-    if (id && confirm('Удалить задачу?')) model.remove(id); 
+  register('todo:remove', ({ target }) => {
+    const id = target.getAttribute('data-id');
+    if (id && confirm('Удалить задачу?')) model.remove(id);
   });
 
-  register('todo:toggle', ({ target }) => { 
-    const id = target.getAttribute('data-id'); 
-    if (id) model.toggle(id); 
+  register('todo:toggle', ({ target }) => {
+    const id = target.getAttribute('data-id');
+    if (id) model.toggle(id);
   });
 
   return { el: root, destroy: unsub };

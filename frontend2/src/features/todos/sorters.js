@@ -1,4 +1,9 @@
 export const sorters = {
+  order: (a, b, dir) => {
+    const av = (typeof a.order === 'number') ? a.order : 0;
+    const bv = (typeof b.order === 'number') ? b.order : 0;
+    return dir * (av - bv);
+  },
   createdAt: (a, b, dir) => dir * (a.createdAt - b.createdAt),
   title:     (a, b, dir) => dir * a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' }),
   due:       (a, b, dir, sortDir) => {

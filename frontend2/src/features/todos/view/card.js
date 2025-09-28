@@ -2,7 +2,11 @@ import { el } from '../../../lib/dom.js';
 import { Button } from '../../../ui/Button.js';
 
 export function renderCard(t) {
-  const li = el('li', { class:'todo' });
+  const li = el('li', { 
+    class:'todo', 
+    draggable: true, 
+    'data-id': t.id 
+  });
   if (t.done) li.classList.add('is-done');
 
   const title = el('div',{ class:'todo__title', textContent:t.title });

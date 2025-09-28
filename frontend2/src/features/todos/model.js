@@ -2,7 +2,8 @@
 export function createTodoModel(store) {
   function add({ title, description = '', due = null }) {
     const todos = store.get().todos ?? [];
-    const todo = { id: crypto.randomUUID(), title, description, due, done: false, createdAt: Date.now() };
+    const maxOrder = todos.length ? Math.max(...todos.map(t => t.order ?? 0)) : -1;
+    const todo = { id: crypto.randomUUID(), title, description, due, done: false, createdAt: Date.now(), order: maxOrder + 1, };
     store.set({ todos: [todo, ...todos] });
   }
   function toggle(id) {
