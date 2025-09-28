@@ -79,15 +79,23 @@ export function attachDnd({ list, store }) {
     }
 
     // пересчитать order по текущему DOM и сохранить в store
+    // внутри 'drop' после вычисления ids:
     const ids = [...list.querySelectorAll('.todo')].map(li => li.dataset.id);
     const { todos = [] } = store.get();
 
-    const byId = new Map(todos.map(t => [t.id, t]));
-    const newTodos = ids.map((id, idx) => {
-      const t = byId.get(id);
-      return t ? { ...t, order: idx } : null;
-    }).filter(Boolean);
+    const rank = new Map(ids.map((id, idx) => [id, idx]));
 
-    store.set({ todos: newTodos });
+    // 1) оставляем все задачи
+    const updated = todos.map(t => {
+    if (!rank.has(t.id)) return t;          // не на экране — не трогаем
+    return { ...t, order: rank.get(t.id) }; // на экране — новый относительный порядок
+    });
+
+    // 2) нормализуем order так, чтобы все были уникальны и шли подряд
+    const normalized = [...updated]
+    .sort((a,b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((t, i) => ({ ...t, order: i }));
+
+    store.set({ todos: normalized });
   });
 }
