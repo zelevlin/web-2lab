@@ -1,0 +1,216 @@
+:root {
+  --maxw: 900px;
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+
+  --radius: 12px;
+  --border: 1px solid #e2e2e2;
+
+  --fg: #111;
+  --bg: #fafafa;
+  --muted: #6b7280;
+  --accent: #3b82f6;
+  --danger: #b00020;
+}
+
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
+
+body {
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+/* Каркас */
+.app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.app-header, .app-footer {
+  position: sticky;
+  z-index: 10;
+  background: #fff;
+  border-bottom: var(--border);
+}
+.app-header { top: 0; }
+.app-footer {
+  bottom: 0;
+  border-top: var(--border);
+  border-bottom: none;
+}
+.app-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* критично для корректного внутреннего скролла */
+}
+
+/* Центрируем внутренности и ограничиваем ширину */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+/* Тулбар: в одну линию по центру */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* Прокручиваемая зона списка */
+.todos__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+}
+.todos__listwrap {
+  width: 100%;
+  max-width: var(--maxw);
+  overflow: auto;
+  padding-bottom: var(--space-2);
+}
+.todos__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Карточка задачи */
+.todo {
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: var(--space-2);
+}
+.todo__title { font-weight: 600; font-size: 17px; }
+.todo__desc  { color: var(--muted); }
+.todo__meta  { color: var(--muted); font-size: 14px; }
+.todo__actions {
+  display: flex;
+  gap: var(--space-2);
+  align-self: start;
+}
+.todo.is-done {
+  opacity: .7;
+  text-decoration: line-through;
+}
+
+/* Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s ease, transform .06s ease;
+}
+.btn:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.btn--primary { background: var(--accent); color: #fff; }
+.btn--primary:hover { filter: brightness(.95); }
+.btn--ghost { background: #fff; border: var(--border); }
+.btn--ghost:hover { background: #f5f5f5; }
+.btn--danger { background: var(--danger); color: #fff; }
+.btn--sm { font-size: 14px; padding: 6px 10px; }
+.is-loading { opacity: .75; pointer-events: none; }
+
+/* Инпуты/селекты */
+.input, .select, .date {
+  height: 36px;
+  padding: 0 10px;
+  border: var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* Диалог добавления/редактирования */
+dialog {
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0,0,0,.1);
+}
+dialog::backdrop { background: rgba(0,0,0,.25); }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.form__row { display: flex; gap: 10px; }
+.form input[type="text"], .form textarea, .form input[type="date"] {
+  width: 100%;
+  border: var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+/* Доп. элементы тулбара */
+.toolbar__row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.label { color: var(--muted); font-size: 14px; }
+
+/* Inline-редактирование карточки */
+.todo--editing { outline: 2px dashed rgba(0,0,0,.08); }
+.todo__edit { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.todo__edit .row { display: flex; gap: 8px; }
+.todo__edit input[type="text"], .todo__edit textarea, .todo__edit input[type="date"] {
+  width: 100%;
+  border: var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+/* Composer */
+.composer {
+  background: #fff;
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+.composer__row { display: flex; gap: var(--space-2); align-items: center; }
+.composer label { font-size: 14px; color: var(--muted); min-width: 100px; }
+.composer input[type="text"], .composer textarea, .composer input[type="date"] {
+  flex: 1 1 auto;
+  border: var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+/* DnD */
+.todo.dragging { opacity: 0.5; }
+.todos__list .todo { transition: transform 0.15s ease; }
+.todo.drop-before { border-top: 2px solid var(--accent); }
+.todo.drop-after  { border-bottom: 2px solid var(--accent); }
+
+[hidden] { display: none !important; }
