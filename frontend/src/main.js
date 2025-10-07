@@ -12,6 +12,19 @@ const bus = createBus();
 const store = createStore({ todos: [] }, { key: 'app:v1' });
 const router = createRouter({ '/': true, '/about': true });
 
+function ensureFavicon(href) {
+  const head = document.head;
+  if (!head) return;
+
+  const existing = head.querySelector('link[rel~="icon"]');
+  const link = existing ?? document.createElement('link');
+  link.rel = 'icon';
+  link.type = 'image/x-icon';
+  link.href = href;
+
+  if (!existing) head.appendChild(link);
+}
+
 const cfg = await loadConfig(); // { API_BASE: ... }
 console.log('Config:', cfg);
 
@@ -20,9 +33,16 @@ try {
   const layout = createLayout(); // layout живет внутри try
   console.log('after createLayout', layout);
 
-  const host = document.getElementById('app');
+  let host = document.getElementById('app');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'app';
+    const parent = document.body ?? document.documentElement;
+    parent.appendChild(host);
+  }
   console.log('host #app =', host);
-  if (!host) throw new Error('No #app in DOM');
+
+  ensureFavicon(new URL('./favicon.ico', window.location.href).toString());
 
   layout.mountIn(host);
   console.log('Layout mounted');
